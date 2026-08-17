@@ -1,20 +1,18 @@
 services:
-  # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
+    image: 'postgres:16-alpine'
     container_name: mychess-db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-chessconnect}
-      POSTGRES_USER: ${POSTGRES_USER:-chess}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-    # Port non exposé en prod - décommenter uniquement pour debug local
-    # ports:
-    #   - "5433:5432"
+      POSTGRES_DB: '${POSTGRES_DB:-chessconnect}'
+      POSTGRES_USER: '${POSTGRES_USER:-chess}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups
+      - 'postgres_data:/var/lib/postgresql/data'
+      - './backups:/backups'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-chess} -d ${POSTGRES_DB:-chessconnect}"]
+      test:
+        - CMD-SHELL
+        - 'pg_isready -U ${POSTGRES_USER:-chess} -d ${POSTGRES_DB:-chessconnect}'
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,7 +25,6 @@ services:
       - mychess-network
     restart: unless-stopped
 
-  # Spring Boot Backend
   backend:
     build:
       context: ./backend-api
@@ -36,50 +33,41 @@ services:
     environment:
       TZ: Europe/Paris
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-chessconnect}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-chess}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
-      # Stripe API Keys - Set via .env file or environment variables
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
-      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-      # Email Configuration
-      SPRING_MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
-      SPRING_MAIL_PORT: ${MAIL_PORT:-587}
-      SPRING_MAIL_USERNAME: ${MAIL_USERNAME:-}
-      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD:-}
-      SPRING_MAIL_ENABLED: ${MAIL_ENABLED:-false}
-      # Admin Configuration
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-support@mychess.fr}
-      # Jitsi Configuration
-      JITSI_APP_ID: ${JITSI_APP_ID:-mychess}
-      JITSI_APP_SECRET: ${JITSI_APP_SECRET:?JITSI_APP_SECRET is required}
-      JITSI_DOMAIN: ${JITSI_DOMAIN:-meet.mychess.fr}
-      # Jibri Recording Webhook Secret (optional but recommended)
-      JIBRI_WEBHOOK_SECRET: ${JIBRI_WEBHOOK_SECRET:-}
-      # Bunny Stream Configuration (for video streaming with transcoding)
-      BUNNY_STREAM_API_KEY: ${BUNNY_STREAM_API_KEY:-}
-      BUNNY_STREAM_LIBRARY_ID: ${BUNNY_STREAM_LIBRARY_ID:-590076}
-      BUNNY_STREAM_CDN_HOSTNAME: ${BUNNY_STREAM_CDN_HOSTNAME:-vz-34fe20be-093.b-cdn.net}
-      # Bunny Storage CDN Configuration (for direct file hosting)
-      BUNNY_STORAGE_ZONE: ${BUNNY_STORAGE_ZONE:-mychess}
-      BUNNY_STORAGE_API_KEY: ${BUNNY_STORAGE_API_KEY:-}
-      BUNNY_STORAGE_HOST: ${BUNNY_STORAGE_HOST:-storage.bunnycdn.com}
-      BUNNY_CDN_URL: ${BUNNY_CDN_URL:-https://mychess.b-cdn.net}
-      # Web Push Notifications (VAPID keys - optional, auto-generated if not set)
-      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
-      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
-      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:support@mychess.fr}
-      # Maintenance mode
-      MAINTENANCE_MODE: ${MAINTENANCE_MODE:-false}
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://postgres:5432/${POSTGRES_DB:-chessconnect}'
+      SPRING_DATASOURCE_USERNAME: '${POSTGRES_USER:-chess}'
+      SPRING_DATASOURCE_PASSWORD: '${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}'
+      JWT_SECRET: '${JWT_SECRET:?JWT_SECRET is required}'
+      FRONTEND_URL: '${FRONTEND_URL:-https://mychess.fr}'
+      STRIPE_SECRET_KEY: '${STRIPE_SECRET_KEY}'
+      STRIPE_PUBLISHABLE_KEY: '${STRIPE_PUBLISHABLE_KEY}'
+      STRIPE_WEBHOOK_SECRET: '${STRIPE_WEBHOOK_SECRET}'
+      SPRING_MAIL_HOST: '${MAIL_HOST:-smtp.gmail.com}'
+      SPRING_MAIL_PORT: '${MAIL_PORT:-587}'
+      SPRING_MAIL_USERNAME: '${MAIL_USERNAME:-}'
+      SPRING_MAIL_PASSWORD: '${MAIL_PASSWORD:-}'
+      SPRING_MAIL_ENABLED: '${MAIL_ENABLED:-false}'
+      ADMIN_EMAIL: '${ADMIN_EMAIL:-support@mychess.fr}'
+      JITSI_APP_ID: '${JITSI_APP_ID:-mychess}'
+      JITSI_APP_SECRET: '${JITSI_APP_SECRET:?JITSI_APP_SECRET is required}'
+      JITSI_DOMAIN: '${JITSI_DOMAIN:-meet.mychess.fr}'
+      JIBRI_WEBHOOK_SECRET: '${JIBRI_WEBHOOK_SECRET:-}'
+      BUNNY_STREAM_API_KEY: '${BUNNY_STREAM_API_KEY:-}'
+      BUNNY_STREAM_LIBRARY_ID: '${BUNNY_STREAM_LIBRARY_ID:-590076}'
+      BUNNY_STREAM_CDN_HOSTNAME: '${BUNNY_STREAM_CDN_HOSTNAME:-vz-34fe20be-093.b-cdn.net}'
+      BUNNY_STORAGE_ZONE: '${BUNNY_STORAGE_ZONE:-mychess}'
+      BUNNY_STORAGE_API_KEY: '${BUNNY_STORAGE_API_KEY:-}'
+      BUNNY_STORAGE_HOST: '${BUNNY_STORAGE_HOST:-storage.bunnycdn.com}'
+      BUNNY_CDN_URL: '${BUNNY_CDN_URL:-https://mychess.b-cdn.net}'
+      VAPID_PUBLIC_KEY: '${VAPID_PUBLIC_KEY:-}'
+      VAPID_PRIVATE_KEY: '${VAPID_PRIVATE_KEY:-}'
+      VAPID_SUBJECT: '${VAPID_SUBJECT:-mailto:support@mychess.fr}'
+      MAINTENANCE_MODE: '${MAINTENANCE_MODE:-false}'
     ports:
-      - "8282:8282"
+      - '8282:8282'
     volumes:
-      - uploads_data:/app/uploads
-      - /var/jibri/recordings:/var/jibri/recordings
-      - /tmp/video-concat:/tmp/video-concat
+      - 'uploads_data:/app/uploads'
+      - '/var/jibri/recordings:/var/jibri/recordings'
+      - '/tmp/video-concat:/tmp/video-concat'
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,7 +80,6 @@ services:
       - mychess-network
     restart: unless-stopped
 
-  # Angular Frontend (SSR with Node.js)
   frontend:
     build:
       context: ./frontend-web
@@ -100,9 +87,7 @@ services:
     container_name: mychess-frontend
     environment:
       PORT: 4000
-      API_URL: http://backend:8282/api
-    ports:
-      - "4200:4000"
+      API_URL: 'http://backend:8282/api'
     depends_on:
       - backend
     deploy:
@@ -119,5 +104,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
-  uploads_data:
+  postgres_data: null
+  uploads_data: null
